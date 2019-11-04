@@ -1,7 +1,4 @@
-# Interpretable Handmade Decision Tree Model for Pill Shape Classification in Small Data Setting
 
-## Data
+# Code
 
-## Code
-
-## Results
+The code branch provides all of the code to perform the analysis. The image operators and metric collection was performed in python, while the modeling and plot generation was performed in R.
