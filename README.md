@@ -1,7 +1,3 @@
-# Interpretable Handmade Decision Tree Model for Pill Shape Classification in Small Data Setting
+# Data
 
-## Data
-
-## Code
-
-## Results
+The data branch provides all of the data collected from the python scripts. Additionally metrics were collected but not used in the final model.
