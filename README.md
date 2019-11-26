@@ -18,4 +18,4 @@ The plots branch provides many of the R generated scatterplots used to manually 
 
 ## Results
 
-Overall, we are able to acheive near perfect classification.  Our only errors occur between capsule and oval class shapes.  
+Overall, we are able to acheive near perfect classification with an overall classification rate of 97.83%.  Our only errors occur between capsule and oval class shapes.  
