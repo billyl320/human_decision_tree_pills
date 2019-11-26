@@ -189,6 +189,31 @@ labs_qda[-keep]<-0
 test<-as.data.frame(cbind(labs_qda, mydata, myshape))
 
 sp<-test$white/(test$white+test$black)
+
+#fix mistake
+svns<-which(labs==7)
+
+#boxplot(sp[svns])
+#table(round(sp[svns], 2))
+#pi/4
+
+look_round<-which(sp[svns]<0.70)
+
+labs[svns[look_round]]=4
+labs2[svns[look_round]]="Oval"
+
+keep<-which( ( labs== 1)| ( labs== 4)|
+             ( labs== 6)| ( labs== 7) )
+
+labs_qda<-as.numeric(labs)
+labs_qda[keep]<-1
+labs_qda[-keep]<-0
+
+test<-as.data.frame(cbind(labs_qda, mydata, myshape))
+
+sp<-test$white/(test$white+test$black)
+
+
 plot(sp, myshape$Shape_eccent, col=as.factor(labs_qda))
 
 #creating model
@@ -245,12 +270,12 @@ keep_oval<-which( ( labs== 4) )
 
 cap_rand<-sample(keep_cap, 332)
 train_01<-cap_rand[1:25]
-oval_rand<-sample(keep_oval, 686)
+oval_rand<-sample(keep_oval, 688)
 train_4<-oval_rand[1:25]
 
 rect_rand<-sample(keep_rect, 6)
 train_6<-rect_rand[1:3]
-circ_rand<-sample(keep_circ, 906)
+circ_rand<-sample(keep_circ, 904)
 train_7<-circ_rand[1:25]
 
 
@@ -342,8 +367,8 @@ mean(ypred== valid$labs_svm )
 
 
 ########################################################
-#classifying rectangle and round vs. capsule and oval
-#using circularity and eccentricity
+#classifying  round vs. capsule and oval and rectangle
+#using circularity and SP
 
 #step 1.1
 #SVM model
@@ -353,15 +378,15 @@ mean(ypred== valid$labs_svm )
 train_vals<-c(train_01, train_4, train_6, train_7)
 
 labs_qda<-as.numeric(labs)
-labs_qda[c(cap_rand, oval_rand)]<-1
-#labs_qda[-keep_qda]<-0
+labs_qda[c(circ_rand)]<-1
+labs_qda[-c(circ_rand)]<-0
 
 test<-as.data.frame(cbind(labs_qda[train_vals],
                           myshape$Shape_circ[train_vals],
-                          myshape$Shape_eccent[train_vals]))
+                          sp[train_vals]))
 colnames(test)[1]<-"labs_qda"
 colnames(test)[2]<-"Circ"
-colnames(test)[3]<-"Eccent"
+colnames(test)[3]<-"SP"
 
 #validation setup
 valid_vals<-c(cap_rand[26:length(cap_rand)], oval_rand[26:length(oval_rand)],
@@ -369,13 +394,70 @@ valid_vals<-c(cap_rand[26:length(cap_rand)], oval_rand[26:length(oval_rand)],
 
 valid<-as.data.frame(cbind(labs_qda[valid_vals],
                           myshape$Shape_circ[valid_vals],
-                          myshape$Shape_eccent[valid_vals]))
+                          sp[valid_vals]))
 colnames(valid)[1]<-"labs_qda"
 colnames(valid)[2]<-"Circ"
-colnames(valid)[3]<-"Eccent"
+colnames(valid)[3]<-"SP"
 
 
-svmfit=svm(as.factor(labs_qda) ~ Circ + Eccent,
+svmfit=svm(as.factor(labs_qda) ~ Circ + SP,
+       data=test,
+       #kernel='radial',
+       kernel="polynomial",
+       cost=1, coef0= 1, degree=10)
+       #gamma=0.1)
+
+#testing
+plot(svmfit, test, SP~ Circ)
+summary(svmfit)
+
+ypred=predict(svmfit ,test)
+table(predict=ypred, truth=test$labs_qda)
+mean(ypred== test$labs_qda )
+
+#validation
+plot(svmfit, valid, SP ~ Circ)
+
+ypred=predict(svmfit ,valid)
+table(predict=ypred, truth=valid$labs_qda)
+mean(ypred== valid$labs_qda )
+
+
+########################################################
+#classifying  capsule and oval vs. rectangle
+#using circularity and SP
+
+#step 1.1
+#SVM model
+########################################################
+
+#training setup
+train_vals<-c(train_01, train_4, train_6)
+
+labs_qda<-as.numeric(labs)
+labs_qda[c(rect_rand)]<-1
+labs_qda[-c(rect_rand)]<-0
+
+test<-as.data.frame(cbind(labs_qda[train_vals],
+                          myshape$Shape_eccent[train_vals],
+                          myshape$Shape_circ[train_vals]))
+colnames(test)[1]<-"labs_qda"
+colnames(test)[2]<-"Eccent"
+colnames(test)[3]<-"Circ"
+
+#validation setup
+valid_vals<-c(cap_rand[26:length(cap_rand)], oval_rand[26:length(oval_rand)],
+              rect_rand[4:6], circ_rand[25:length(circ_rand)])
+
+valid<-as.data.frame(cbind(labs_qda[valid_vals],
+                          myshape$Shape_eccent[valid_vals],
+                          myshape$Shape_circ[valid_vals]))
+colnames(valid)[1]<-"labs_qda"
+colnames(valid)[2]<-"Eccent"
+colnames(valid)[3]<-"Circ"
+
+
+svmfit=svm(as.factor(labs_qda) ~ Eccent + Circ,
        data=test,
        #kernel='radial',
        kernel="polynomial",
@@ -396,6 +478,7 @@ plot(svmfit, valid, Eccent ~ Circ)
 ypred=predict(svmfit ,valid)
 table(predict=ypred, truth=valid$labs_qda)
 mean(ypred== valid$labs_qda )
+
 
 #step 1.1.1
 #COLS model for oval and capsule
@@ -618,7 +701,7 @@ svmfit=svm(as.factor(labs_svm) ~ White_box + Black_box,
        data=train,
        #kernel='radial',
        kernel="polynomial",
-       cost=1, coef0= 2, degree=5)
+       cost=1, coef0= 2, degree=10)
        #gamma=0.1)
 
 #testing
@@ -695,7 +778,7 @@ mean(ypred== valid$labs_svm )
 
 
 
-#classifying Trapezoid vs. Diamond 
+#classifying Trapezoid vs. Diamond
 #using Black_box and White_box
 # COLS or SVM
 
@@ -833,7 +916,3 @@ plot(svmfit, valid, Black_box~ White_box)
 ypred=predict(svmfit ,valid)
 table(predict=ypred, truth=valid$labs_svm)
 mean(ypred== valid$labs_svm )
-
-
-
-#
