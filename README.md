@@ -1,6 +1,8 @@
-# Interpretable Handmade Decision Tree Model for Pill Shape Classification in Small Data Setting
+# Pill Shape Classification for Small Data with Human-Machine Hybrid Explainable Model
 
-Pills or capsules are still one of the most popular methods for taking medical pre- scriptions as they are a safe and reliable form of drug administration. However, various communities such as law enforcement agencies, health care providers and recipients, and pharmaceutical companies desire to be able to correctly identify pills using computer vision techniques by law enforcement, health care, and phar- maceutical agencies. Since we cannot perfectly identify pills, it is vitally impor- tant to understand how to identify a pill’s shape. Since some of the pill shape classes are limited while others are plentiful, this increases the complexity in the model building process due to having imbalanced data. Our objective is to create an interpretable model based on shape proportions and encircled image- histograms, SPEIs, using a human guided or handcrafted decision tree using the SVM classification algorithm at each node to discriminate the pill shapes that is applicable in a small data setting.
+## Abstract
+
+This paper presents a near perfect interpretable solution for pill shape classification.  Using a human-machine hybrid approach, we were able to achieve an overall classification rate of 97.83%.  The only misclassifications occurred between ovals and capsules.  Our final model used a decision tree, where each node classified meta-classes, or groups of classes, using support vector machines with a polynomial kernel.  While the data was imbalanced between the classes, this model was able to overcome this challenge through the use of meta-classes.  By limiting each node of the decision tree to only two variables to build the model to discriminate the meta-classes, each node is interpretable as the final decision boundaries can be plotted using only two variables.  
 
 ## Data
 
