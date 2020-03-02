@@ -334,16 +334,16 @@ test<-as.data.frame(cbind(labs_qda[train_vals],
                           myshape$Shape_eccent[train_vals]))
 colnames(test)[1]<-"labs_svm"
 colnames(test)[2]<-"SP"
-colnames(test)[3]<-"Eccent"
+colnames(test)[3]<-"Eccentricity"
 
 valid<-as.data.frame(cbind(labs_qda[-train_vals],
                                      sp[-train_vals],
                                      myshape$Shape_eccent[-train_vals]))
 colnames(valid)[1]<-"labs_svm"
 colnames(valid)[2]<-"SP"
-colnames(valid)[3]<-"Eccent"
+colnames(valid)[3]<-"Eccentricity"
 
-svmfit=svm(as.factor(labs_svm) ~ SP + Eccent,
+svmfit=svm(as.factor(labs_svm) ~ SP + Eccentricity,
        data=test,
        #kernel='radial',
        kernel="polynomial",
@@ -351,7 +351,8 @@ svmfit=svm(as.factor(labs_svm) ~ SP + Eccent,
        #gamma=0.1)
 
 #testing
-plot(svmfit, test, Eccent~ SP)
+plot(svmfit, test, Eccentricity~ SP)
+title(sub=expression(paste("SVM"^"1",":SP vs. Eccentricity")))
 summary(svmfit)
 
 ypred=predict(svmfit ,test)
