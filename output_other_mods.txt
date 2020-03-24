@@ -1,5 +1,5 @@
 
-R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+R version 3.4.4 (2018-03-15) -- "Someone to Lean On"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
 
@@ -233,7 +233,6 @@ Parameters:
  SVM-Kernel:  polynomial 
        cost:  1 
      degree:  5 
-      gamma:  0.1111111 
      coef.0:  2 
 
 Number of Support Vectors:  144
@@ -268,11 +267,9 @@ predict   1   2   3   4   5   6   7   8   9  10  11  12
 > mean(ypred==as.factor(as.numeric(labs_qda)))
 [1] 0.995
 > 
-> #We are able to get 100% classification.  Now we wish to do it using less data
+> #We are able to get very high % classification.  Now we wish to do it using less data
 > 
-> #step 1
-> #classifying capsule, oval, round, and rectangle vs. else
-> #using sp values and eccentricity
+> #select training observations
 > 
 > set.seed(379737)
 > 
@@ -400,7 +397,6 @@ Parameters:
  SVM-Kernel:  polynomial 
        cost:  1 
      degree:  1 
-      gamma:  0.1111111 
      coef.0:  0 
 
 Number of Support Vectors:  80
@@ -426,6 +422,40 @@ Levels:
 > cm = table(predict=ypred, truth=valid$labs_svm)
 > mean(ypred== valid$labs_svm )
 [1] 0.9570747
+> 
+> #all confusion table
+> ypred_all=predict(svmfit ,rbind(test[,vars_keep],
++                               valid[,vars_keep]) )
+> tab_all = table(predict=ypred_all,
++                 truth=c(test$labs_svm,
++                             valid$labs_svm) )
+> xt<-xtable(as.matrix(tab_all), align=rep("c", dim(tab_all)[1]+1))
+> 
+> names(xt)<-names(table(labs2))
+> xt
+% latex table generated in R 3.4.4 by xtable 1.8-4 package
+% Mon Mar 23 13:22:35 2020
+\begin{table}[ht]
+\centering
+\begin{tabular}{ccccccccccccc}
+  \hline
+ & Capsule & Diamond & Hexagon & Oval & Pentagon & Rectangle & Round & Semi-Circle & Square & Tear & Trapezoid & Triangle \\ 
+  \hline
+1 & 332 &   0 &   0 &  46 &   0 &   4 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  2 &   0 &   6 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  3 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  4 &   0 &   6 &   0 & 638 &   2 &   2 &   0 &   4 &   0 &  10 &   4 &   2 \\ 
+  5 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  6 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  7 &   0 &   0 &   8 &   4 &  10 &   0 & 904 &   0 &   8 &   0 &   0 &   0 \\ 
+  8 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  9 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  10 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  11 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  12 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &  10 \\ 
+   \hline
+\end{tabular}
+\end{table}
 > 
 > #map from https://blog.revolutionanalytics.com/2016/03/com_class_eval_metrics_r.html
 > 
@@ -469,7 +499,6 @@ Parameters:
    SVM-Type:  C-classification 
  SVM-Kernel:  radial 
        cost:  1 
-      gamma:  3 
 
 Number of Support Vectors:  98
 
@@ -494,6 +523,41 @@ Levels:
 > cm = table(predict=ypred, truth=valid$labs_svm)
 > mean(ypred== valid$labs_svm )
 [1] 0.9491256
+> 
+> #all confusion table
+> ypred_all=predict(svmfit ,rbind(test[,vars_keep],
++                               valid[,vars_keep]) )
+> tab_all = table(predict=ypred_all,
++                 truth=c(test$labs_svm,
++                             valid$labs_svm) )
+> xt<-xtable(as.matrix(tab_all), align=rep("c", dim(tab_all)[1]+1))
+> 
+> names(xt)<-names(table(labs2))
+> xt
+% latex table generated in R 3.4.4 by xtable 1.8-4 package
+% Mon Mar 23 13:22:36 2020
+\begin{table}[ht]
+\centering
+\begin{tabular}{ccccccccccccc}
+  \hline
+ & Capsule & Diamond & Hexagon & Oval & Pentagon & Rectangle & Round & Semi-Circle & Square & Tear & Trapezoid & Triangle \\ 
+  \hline
+1 & 318 &   0 &   0 &  34 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  2 &   0 &  10 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  3 &   0 &   0 &   8 &   2 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  4 &  14 &   2 &   0 & 647 &   4 &   2 &  26 &   0 &   2 &   2 &   2 &   0 \\ 
+  5 &   0 &   0 &   0 &   0 &   8 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  6 &   0 &   0 &   0 &   0 &   0 &   4 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  7 &   0 &   0 &   0 &   1 &   0 &   0 & 878 &   0 &   0 &   0 &   0 &   0 \\ 
+  8 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  9 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   6 &   0 &   0 &   0 \\ 
+  10 &   0 &   0 &   0 &   4 &   0 &   0 &   0 &   4 &   0 &   8 &   0 &   0 \\ 
+  11 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   2 &   0 \\ 
+  12 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &  12 \\ 
+   \hline
+\end{tabular}
+\end{table}
+> 
 > 
 > #map from https://blog.revolutionanalytics.com/2016/03/com_class_eval_metrics_r.html
 > 
@@ -537,7 +601,6 @@ Parameters:
    SVM-Type:  C-classification 
  SVM-Kernel:  sigmoid 
        cost:  1 
-      gamma:  0.1 
      coef.0:  0 
 
 Number of Support Vectors:  84
@@ -564,6 +627,41 @@ Levels:
 > mean(ypred== valid$labs_svm )
 [1] 0.8585056
 > 
+> #all confusion table
+> ypred_all=predict(svmfit ,rbind(test[,vars_keep],
++                               valid[,vars_keep]) )
+> tab_all = table(predict=ypred_all,
++                 truth=c(test$labs_svm,
++                             valid$labs_svm) )
+> xt<-xtable(as.matrix(tab_all), align=rep("c", dim(tab_all)[1]+1))
+> 
+> names(xt)<-names(table(labs2))
+> xt
+% latex table generated in R 3.4.4 by xtable 1.8-4 package
+% Mon Mar 23 13:22:38 2020
+\begin{table}[ht]
+\centering
+\begin{tabular}{ccccccccccccc}
+  \hline
+ & Capsule & Diamond & Hexagon & Oval & Pentagon & Rectangle & Round & Semi-Circle & Square & Tear & Trapezoid & Triangle \\ 
+  \hline
+1 & 270 &   0 &   0 & 144 &   0 &   4 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  2 &   0 &   8 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  3 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  4 &  62 &   4 &   0 & 532 &   2 &   2 &   2 &   4 &   0 &  10 &   4 &   2 \\ 
+  5 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  6 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  7 &   0 &   0 &   6 &  12 &  10 &   0 & 880 &   0 &   8 &   0 &   0 &  10 \\ 
+  8 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  9 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  10 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  11 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  12 &   0 &   0 &   2 &   0 &   0 &   0 &  22 &   0 &   0 &   0 &   0 &   0 \\ 
+   \hline
+\end{tabular}
+\end{table}
+> 
+> 
 > #map from https://blog.revolutionanalytics.com/2016/03/com_class_eval_metrics_r.html
 > 
 > mat=rbind(test,valid)
@@ -586,11 +684,12 @@ Levels:
 > 
 > #testing
 > summary(nbfit)
-        Length Class  Mode     
-apriori 12     table  numeric  
-tables   9     -none- list     
-levels  12     -none- character
-call     4     -none- call     
+          Length Class  Mode     
+apriori   12     table  numeric  
+tables     9     -none- list     
+levels    12     -none- character
+isnumeric  9     -none- logical  
+call       4     -none- call     
 > 
 > ypred=predict(nbfit ,test[,vars_keep])
 > cm = table(predict=ypred, truth=test$labs_svm)
@@ -602,6 +701,41 @@ call     4     -none- call
 > cm = table(predict=ypred, truth=valid$labs_svm)
 > mean(ypred== valid$labs_svm )
 [1] 0.6751457
+> 
+> #all confusion table
+> ypred_all=predict(nbfit ,rbind(test[,vars_keep],
++                               valid[,vars_keep]) )
+> tab_all = table(predict=ypred_all,
++                 truth=c(test$labs_svm,
++                             valid$labs_svm) )
+> xt<-xtable(as.matrix(tab_all), align=rep("c", dim(tab_all)[1]+1))
+> 
+> names(xt)<-names(table(labs2))
+> xt
+% latex table generated in R 3.4.4 by xtable 1.8-4 package
+% Mon Mar 23 13:22:39 2020
+\begin{table}[ht]
+\centering
+\begin{tabular}{ccccccccccccc}
+  \hline
+ & Capsule & Diamond & Hexagon & Oval & Pentagon & Rectangle & Round & Semi-Circle & Square & Tear & Trapezoid & Triangle \\ 
+  \hline
+1 & 195 &   0 &   0 &  32 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  2 &   0 &   9 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  3 &   0 &   0 &   2 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  4 &   0 &   1 &   0 & 264 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  5 &   0 &   0 &   0 &   0 &   8 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  6 &   0 &   0 &   0 &   2 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  7 &   0 &   0 &   0 &   0 &   0 &   0 & 845 &   0 &   0 &   0 &   0 &   0 \\ 
+  8 &   7 &   0 &   0 &  17 &   0 &   0 &   2 &   3 &   0 &   0 &   0 &   0 \\ 
+  9 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   5 &   0 &   0 &   0 \\ 
+  10 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   1 &   0 &   7 &   0 &   0 \\ 
+  11 & 130 &   2 &   6 & 369 &   2 &   6 &  57 &   0 &   3 &   3 &   4 &   2 \\ 
+  12 &   0 &   0 &   0 &   4 &   2 &   0 &   0 &   0 &   0 &   0 &   0 &  10 \\ 
+   \hline
+\end{tabular}
+\end{table}
+> 
 > 
 > #map from https://blog.revolutionanalytics.com/2016/03/com_class_eval_metrics_r.html
 > 
@@ -647,21 +781,65 @@ lda.class  1  2  3  4  5  6  7  8  9 10 11 12
 > mean(lda.class==as.factor(as.numeric(test$labs_svm)))
 [1] 0.9557522
 > 
-> 
-> ypred=predict(nbfit, test[,vars_keep])
-> cm = table(predict=ypred, truth=test$labs_svm)
-> mean(ypred== test$labs_svm )
-[1] 0.6902655
-> 
 > #validation
-> ypred=predict(nbfit ,valid[,vars_keep])
-> cm = table(predict=ypred, truth=valid$labs_svm)
-> mean(ypred== valid$labs_svm )
-[1] 0.6751457
+> lda.pred=predict(lda.fit, valid[,vars_keep])
+> lda.class = lda.pred$class
+> 
+> #test
+> table(lda.class, valid[,vars_keep]$labs_svm)
+         
+lda.class   1   2   3   4   5   6   7   8   9  10  11  12
+       1  307   0   0  47   0   2   0   0   0   0   0   0
+       2    0   6   0   0   0   0   0   0   0   0   0   0
+       3    0   0   2   0   2   0   0   0   0   0   0   0
+       4    0   0   0 604   1   0   0   0   0   0   0   0
+       5    0   0   2   4   3   0   0   0   0   0   0   0
+       6    0   0   0   3   0   0   0   0   0   0   0   0
+       7    0   0   0   0   0   0 879   0   0   0   0   0
+       8    0   0   0   0   0   0   0   2   0   3   0   0
+       9    0   0   0   0   0   1   0   0   4   0   2   0
+       10   0   0   0   5   0   0   0   0   0   2   0   0
+       11   0   0   0   0   0   0   0   0   0   0   0   0
+       12   0   0   0   0   0   0   0   0   0   0   0   6
+> #overall classification rate for training
+> mean(lda.class==as.factor(as.numeric(valid$labs_svm)))
+[1] 0.9618442
+> 
+> #all confusion table
+> mat=rbind(test,valid)
+> ypred_all=predict(lda.fit ,mat[,vars_keep])
+> tab_all = table(ypred_all$class,
++                 mat$labs_svm )
+> 
+> xt<-xtable(as.matrix(tab_all), align=rep("c", dim(tab_all)[1]+1))
+> 
+> names(xt)<-names(table(labs2))
+> xt
+% latex table generated in R 3.4.4 by xtable 1.8-4 package
+% Mon Mar 23 13:22:39 2020
+\begin{table}[ht]
+\centering
+\begin{tabular}{ccccccccccccc}
+  \hline
+ & Capsule & Diamond & Hexagon & Oval & Pentagon & Rectangle & Round & Semi-Circle & Square & Tear & Trapezoid & Triangle \\ 
+  \hline
+1 & 332 &   0 &   0 &  47 &   0 &   2 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  2 &   0 &  12 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  3 &   0 &   0 &   4 &   0 &   2 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  4 &   0 &   0 &   0 & 628 &   2 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  5 &   0 &   0 &   4 &   4 &   8 &   0 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  6 &   0 &   0 &   0 &   4 &   0 &   2 &   0 &   0 &   0 &   0 &   0 &   0 \\ 
+  7 &   0 &   0 &   0 &   0 &   0 &   0 & 904 &   0 &   0 &   0 &   0 &   0 \\ 
+  8 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   4 &   0 &   3 &   0 &   0 \\ 
+  9 &   0 &   0 &   0 &   0 &   0 &   2 &   0 &   0 &   8 &   0 &   2 &   0 \\ 
+  10 &   0 &   0 &   0 &   5 &   0 &   0 &   0 &   0 &   0 &   7 &   0 &   0 \\ 
+  11 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   2 &   0 \\ 
+  12 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &   0 &  12 \\ 
+   \hline
+\end{tabular}
+\end{table}
 > 
 > #map from https://blog.revolutionanalytics.com/2016/03/com_class_eval_metrics_r.html
-> 
-> mat=rbind(test,valid)
 > 
 > ypred=predict(lda.fit, mat[,vars_keep])
 > cm = table(predict=ypred$class, truth=mat$labs_svm)
@@ -673,8 +851,8 @@ lda.class  1  2  3  4  5  6  7  8  9 10 11 12
 > mean_prec[5]<-mean(precision)
 > 
 > xtable( t(as.matrix(mean_prec)), digits=3 )
-% latex table generated in R 3.5.0 by xtable 1.8-2 package
-% Wed Feb 26 17:32:35 2020
+% latex table generated in R 3.4.4 by xtable 1.8-4 package
+% Mon Mar 23 13:22:39 2020
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrr}
@@ -686,8 +864,9 @@ lda.class  1  2  3  4  5  6  7  8  9 10 11 12
 \end{tabular}
 \end{table}
 > 
+> 
 > #
 > 
 > proc.time()
    user  system elapsed 
- 16.463   0.116  16.577 
+ 16.303   0.216  16.677 
