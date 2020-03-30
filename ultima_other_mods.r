@@ -458,12 +458,12 @@ mean(lda.class==as.factor(as.numeric(test$labs_svm)))
 
 ypred=predict(lda.fit, test[,vars_keep])
 cm = table(predict=ypred, truth=test$labs_svm)
-mean(ypred== test$labs_svm )
+mean(ypred$class== test$labs_svm )
 
 #validation
 ypred=predict(lda.fit ,valid[,vars_keep])
 cm = table(predict=ypred, truth=valid$labs_svm)
-mean(ypred== valid$labs_svm )
+mean(ypred$class== valid$labs_svm )
 
 #map from https://blog.revolutionanalytics.com/2016/03/com_class_eval_metrics_r.html
 
