@@ -456,12 +456,12 @@ table(lda.class, test[,vars_keep]$labs_svm)
 mean(lda.class==as.factor(as.numeric(test$labs_svm)))
 
 
-ypred=predict(nbfit, test[,vars_keep])
+ypred=predict(lda.fit, test[,vars_keep])
 cm = table(predict=ypred, truth=test$labs_svm)
 mean(ypred== test$labs_svm )
 
 #validation
-ypred=predict(nbfit ,valid[,vars_keep])
+ypred=predict(lda.fit ,valid[,vars_keep])
 cm = table(predict=ypred, truth=valid$labs_svm)
 mean(ypred== valid$labs_svm )
 
