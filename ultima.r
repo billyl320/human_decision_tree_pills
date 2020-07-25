@@ -313,12 +313,40 @@ train_11<-trap_rand[1:2]
 tri_rand<-sample(keep_tri, 12)
 train_12<-tri_rand[1:6]
 
+#creating bootstrap observations
+#equal numbers by each class: 1000
+boot_01<-sample(keep_cap, 1000, replace=TRUE)
+boot_4<-sample(keep_oval, 1000, replace=TRUE)
+boot_6<-sample(keep_rect, 1000, replace=TRUE)
+boot_7<-sample(keep_circ, 1000, replace=TRUE)
+
+boot_2<-sample(keep_diam, 1000, replace=TRUE)
+#preserving strata
+boot_3<-sample(keep_hex[1:6], 750, replace=TRUE)
+boot_3[751:1000]<-sample(keep_hex[7:8], 250, replace=TRUE)
+boot_5<-sample(keep_pent, 1000, replace=TRUE)
+
+boot_8<-sample(keep_sc, 1000, replace=TRUE)
+boot_9<-sample(keep_squ, 1000, replace=TRUE)
+boot_10<-sample(keep_tear, 1000, replace=TRUE)
+boot_11<-sample(keep_trap, 1000, replace=TRUE)
+boot_12<-sample(keep_tri, 1000, replace=TRUE)
+
+boot_1<-c(boot_01, boot_4,
+           boot_6, boot_7)
+
 train_0<- c(train_2, train_3,
             train_5, train_8,
             train_9, train_10,
             train_11, train_12)
 
+boot_0<- c(boot_2, boot_3,
+            boot_5, boot_8,
+            boot_9, boot_10,
+            boot_11, boot_12)
+
 train_vals<-c(train_1, train_0)
+boot_vals<-c(boot_1, boot_0)
 
 keep_qda<-c(keep_rect, keep_circ,
             keep_cap, keep_oval)
@@ -340,6 +368,14 @@ valid<-as.data.frame(cbind(labs_qda[-train_vals],
 colnames(valid)[1]<-"labs_svm"
 colnames(valid)[2]<-"SP"
 colnames(valid)[3]<-"Eccentricity"
+
+boot<-as.data.frame(cbind(labs_qda[boot_vals],
+                                     sp[boot_vals],
+                                     myshape$Shape_eccent[boot_vals]))
+colnames(boot)[1]<-"labs_svm"
+colnames(boot)[2]<-"SP"
+colnames(boot)[3]<-"Eccentricity"
+
 
 svmfit=svm(as.factor(labs_svm) ~ SP + Eccentricity,
        data=test,
@@ -364,6 +400,11 @@ ypred=predict(svmfit ,valid)
 table(predict=ypred, truth=valid$labs_svm)
 mean(ypred== valid$labs_svm )
 
+#bootstraped validation
+ypred=predict(svmfit ,boot)
+table(predict=ypred, truth=boot$labs_svm)
+mean(ypred== boot$labs_svm )
+
 
 ########################################################
 #classifying  round vs. capsule and oval and rectangle
@@ -375,6 +416,8 @@ mean(ypred== valid$labs_svm )
 
 #training setup
 train_vals<-c(train_01, train_4, train_6, train_7)
+
+boot_vals<-c(boot_01, boot_4, boot_6, boot_7)
 
 labs_qda<-as.numeric(labs)
 labs_qda[c(circ_rand)]<-1
@@ -398,6 +441,12 @@ colnames(valid)[1]<-"labs_qda"
 colnames(valid)[2]<-"Circ"
 colnames(valid)[3]<-"SP"
 
+boot<-as.data.frame(cbind(labs_qda[boot_vals],
+                          myshape$Shape_circ[boot_vals],
+                          sp[boot_vals]))
+colnames(boot)[1]<-"labs_qda"
+colnames(boot)[2]<-"Circ"
+colnames(boot)[3]<-"SP"
 
 svmfit=svm(as.factor(labs_qda) ~ Circ + SP,
        data=test,
@@ -421,6 +470,11 @@ ypred=predict(svmfit ,valid)
 table(predict=ypred, truth=valid$labs_qda)
 mean(ypred== valid$labs_qda )
 
+#bootstrapped validation
+ypred=predict(svmfit ,boot)
+table(predict=ypred, truth=boot$labs_qda)
+mean(ypred== boot$labs_qda )
+
 
 ########################################################
 #classifying  capsule and oval vs. rectangle
@@ -432,6 +486,8 @@ mean(ypred== valid$labs_qda )
 
 #training setup
 train_vals<-c(train_01, train_4, train_6)
+
+boot_vals<-c(boot_01, boot_4, boot_6)
 
 labs_qda<-as.numeric(labs)
 labs_qda[c(rect_rand)]<-1
@@ -455,6 +511,12 @@ colnames(valid)[1]<-"labs_qda"
 colnames(valid)[2]<-"Eccent"
 colnames(valid)[3]<-"Circ"
 
+boot<-as.data.frame(cbind(labs_qda[boot_vals],
+                          myshape$Shape_eccent[boot_vals],
+                          myshape$Shape_circ[boot_vals]))
+colnames(boot)[1]<-"labs_qda"
+colnames(boot)[2]<-"Eccent"
+colnames(boot)[3]<-"Circ"
 
 svmfit=svm(as.factor(labs_qda) ~ Eccent + Circ,
        data=test,
@@ -478,6 +540,238 @@ ypred=predict(svmfit ,valid)
 table(predict=ypred, truth=valid$labs_qda)
 mean(ypred== valid$labs_qda )
 
+#bootstrapped validation
+ypred=predict(svmfit ,boot)
+table(predict=ypred, truth=boot$labs_qda)
+mean(ypred== boot$labs_qda )
+
+########################################################
+#classifying  capsule vs. oval
+#using EIs
+
+#step 1.1
+#SVM model
+########################################################
+#training setup
+train_vals<-c(train_01, train_4)
+
+boot_vals<-c(boot_01, boot_4)
+
+labs_qda<-as.numeric(labs)
+labs_qda[cap_rand]<-1
+labs_qda[oval_rand]<-2
+
+train<-as.data.frame(cbind(labs_qda[train_vals],
+                          mydata$white[train_vals],
+                          mydata$black[train_vals]))
+colnames(train)[1]<-"labs_cols"
+colnames(train)[2]<-"white"
+colnames(train)[3]<-"black"
+
+#validation setup
+valid_vals<-c(cap_rand[26:length(cap_rand)],
+              oval_rand[26:length(oval_rand)])
+
+valid<-as.data.frame(cbind(labs_qda[valid_vals],
+                          mydata$white[valid_vals],
+                          mydata$black[valid_vals]))
+colnames(valid)[1]<-"labs_cols"
+colnames(valid)[2]<-"white"
+colnames(valid)[3]<-"black"
+
+#boot setup
+boot<-as.data.frame(cbind(labs_qda[boot_vals],
+                          mydata$white[boot_vals],
+                          mydata$black[boot_vals]))
+colnames(boot)[1]<-"labs_cols"
+colnames(boot)[2]<-"white"
+colnames(boot)[3]<-"black"
+
+svmfit=svm(as.factor(labs_cols) ~ white + black,
+       data=train,
+       kernel="polynomial",
+       cost=1, coef0= 1, degree=2)
+
+#testing
+plot(svmfit, train, black~white)
+summary(svmfit)
+
+ypred=predict(svmfit ,train)
+table(predict=ypred, truth=train$labs_cols)
+mean(ypred== train$labs_cols )
+
+#validation
+plot(svmfit, valid, black ~ white)
+
+ypred=predict(svmfit ,valid)
+table(predict=ypred, truth=valid$labs_cols)
+mean(ypred== valid$labs_cols )
+
+#bootstrapped validation
+plot(svmfit, boot, black ~ white)
+
+ypred=predict(svmfit ,boot)
+table(predict=ypred, truth=boot$labs_cols)
+mean(ypred== boot$labs_cols )
+
+
+#same meta-classes, but using 2 variables and more observations
+#step 1.1
+#SVM model
+########################################################
+#training setup
+train_01_v2<-cap_rand[1:266]
+train_4_v2<-oval_rand[1:551]
+
+train_vals<-c(train_01_v2, train_4_v2)
+
+labs_qda<-as.numeric(labs)
+labs_qda[cap_rand]<-1
+labs_qda[oval_rand]<-2
+#shape_keep<-c(1:4, 6, 7)
+shape_keep<-c()
+
+train<-as.data.frame(cbind(labs_qda[train_vals],
+                          mydata$white[train_vals],
+                          mydata$black[train_vals],
+                          #mydata$white[train_vals]/(mydata$white[train_vals]+mydata$black[train_vals]),
+                          myshape[train_vals,shape_keep]
+                          ))
+colnames(train)[1]<-"labs_cols"
+colnames(train)[2]<-"white"
+colnames(train)[3]<-"black"
+
+#validation setup
+valid_vals<-c(cap_rand[267:length(cap_rand)],
+              oval_rand[552:length(oval_rand)])
+
+valid<-as.data.frame(cbind(labs_qda[valid_vals],
+                          mydata$white[valid_vals],
+                          mydata$black[valid_vals],
+                          mydata$white[valid_vals]/(mydata$white[valid_vals]+mydata$black[valid_vals]),
+                          myshape[valid_vals,shape_keep]
+                          ))
+colnames(valid)[1]<-"labs_cols"
+colnames(valid)[2]<-"white"
+colnames(valid)[3]<-"black"
+colnames(valid)[4]<-"sp"
+
+boot<-as.data.frame(cbind(labs_qda[boot_vals],
+                          mydata$white[boot_vals],
+                          mydata$black[boot_vals],
+                          mydata$white[boot_vals]/(mydata$white[boot_vals]+mydata$black[boot_vals]),
+                          myshape[boot_vals,shape_keep]
+                          ))
+colnames(boot)[1]<-"labs_cols"
+colnames(boot)[2]<-"white"
+colnames(boot)[3]<-"black"
+colnames(boot)[4]<-"sp"
+
+svmfit=svm(as.factor(labs_cols) ~.,
+       data=train,
+       kernel="polynomial",
+       cost=5, coef0= 1, degree=5)
+
+#testing
+#plot(svmfit, train, black~white)
+summary(svmfit)
+
+ypred=predict(svmfit ,train)
+table(predict=ypred, truth=train$labs_cols)
+mean(ypred== train$labs_cols )
+
+#validation
+#plot(svmfit, valid, black ~ white)
+
+ypred=predict(svmfit ,valid)
+table(predict=ypred, truth=valid$labs_cols)
+mean(ypred== valid$labs_cols )
+
+#bootstrapped validation
+plot(svmfit, boot, black ~ white)
+
+ypred=predict(svmfit ,boot)
+table(predict=ypred, truth=boot$labs_cols)
+mean(ypred== boot$labs_cols )
+
+#same meta-classes, but using all of the variables and more observations
+#step 1.1
+#SVM model
+########################################################
+#training setup
+train_01_v2<-cap_rand[1:266]
+train_4_v2<-oval_rand[1:551]
+
+train_vals<-c(train_01_v2, train_4_v2)
+
+labs_qda<-as.numeric(labs)
+labs_qda[cap_rand]<-1
+labs_qda[oval_rand]<-2
+shape_keep<-c(1:2, 6, 7)
+
+train<-as.data.frame(cbind(labs_qda[train_vals],
+                          mydata$white[train_vals],
+                          mydata$black[train_vals],
+                          mydata$white[train_vals]/(mydata$white[train_vals]+mydata$black[train_vals]),
+                          myshape[train_vals,shape_keep]
+                          ))
+colnames(train)[1]<-"labs_cols"
+colnames(train)[2]<-"white"
+colnames(train)[3]<-"black"
+colnames(train)[4]<-"sp"
+
+#validation setup
+valid_vals<-c(cap_rand[267:length(cap_rand)],
+              oval_rand[552:length(oval_rand)])
+
+valid<-as.data.frame(cbind(labs_qda[valid_vals],
+                          mydata$white[valid_vals],
+                          mydata$black[valid_vals],
+                          mydata$white[valid_vals]/(mydata$white[valid_vals]+mydata$black[valid_vals]),
+                          myshape[valid_vals,shape_keep]
+                          ))
+colnames(valid)[1]<-"labs_cols"
+colnames(valid)[2]<-"white"
+colnames(valid)[3]<-"black"
+colnames(valid)[4]<-"sp"
+
+boot<-as.data.frame(cbind(labs_qda[boot_vals],
+                          mydata$white[boot_vals],
+                          mydata$black[boot_vals],
+                          mydata$white[boot_vals]/(mydata$white[boot_vals]+mydata$black[boot_vals]),
+                          myshape[boot_vals,shape_keep]
+                          ))
+colnames(boot)[1]<-"labs_cols"
+colnames(boot)[2]<-"white"
+colnames(boot)[3]<-"black"
+colnames(boot)[4]<-"sp"
+
+svmfit=svm(as.factor(labs_cols) ~.,
+       data=train,
+       kernel="polynomial",
+       cost=5, coef0= 1, degree=5)
+
+#testing
+#plot(svmfit, train, black~white)
+summary(svmfit)
+
+ypred=predict(svmfit ,train)
+table(predict=ypred, truth=train$labs_cols)
+mean(ypred== train$labs_cols )
+
+#validation
+#plot(svmfit, valid, black ~ white)
+
+ypred=predict(svmfit ,valid)
+table(predict=ypred, truth=valid$labs_cols)
+mean(ypred== valid$labs_cols )
+
+#bootstrapped validation
+plot(svmfit, boot, black ~ white)
+
+ypred=predict(svmfit ,boot)
+table(predict=ypred, truth=boot$labs_cols)
+mean(ypred== boot$labs_cols )
 
 #step 1.2
 #classying Tear and Semi-Circle vs Triangle vs. else (Trap, Square, Hex, Diamond)
@@ -489,6 +783,12 @@ train_vals<-c(train_10,
               train_12,
               train_8,
               train_11, train_9, train_3, train_2, train_5)
+
+boot_vals<-c(boot_10,
+              boot_12,
+              boot_8,
+              boot_11, boot_9, boot_3, boot_2, boot_5)
+
 
 labs_qda<-as.numeric(labs)
 labs_qda[c(tear_rand, sc_rand)]<-1
@@ -520,6 +820,14 @@ colnames(valid)[1]<-"labs_svm"
 colnames(valid)[2]<-"SP"
 colnames(valid)[3]<-"Eccent"
 
+#bootstrap setup
+boot<-as.data.frame(cbind(labs_qda[boot_vals],
+                          mydata$white[boot_vals]/(mydata$white[boot_vals]+mydata$black[boot_vals]),
+                          myshape$Shape_eccent[boot_vals]))
+colnames(boot)[1]<-"labs_svm"
+colnames(boot)[2]<-"SP"
+colnames(boot)[3]<-"Eccent"
+
 
 svmfit=svm(as.factor(labs_svm) ~ SP + Eccent,
        data=train,
@@ -543,7 +851,10 @@ ypred=predict(svmfit ,valid)
 table(predict=ypred, truth=valid$labs_svm)
 mean(ypred== valid$labs_svm )
 
-
+#bootstraped validation
+ypred=predict(svmfit ,boot)
+table(predict=ypred, truth=boot$labs_svm)
+mean(ypred== boot$labs_svm )
 
 
 #classifying Tear vs. Semi-Circle
@@ -555,6 +866,10 @@ mean(ypred== valid$labs_svm )
 #training setup
 train_vals<-c(train_10,
               train_8)
+
+boot_vals<-c(boot_10,
+              boot_8)
+
 
 labs_qda<-as.numeric(labs)
 labs_qda[tear_rand]<-1
@@ -579,6 +894,13 @@ colnames(valid)[1]<-"labs_svm"
 colnames(valid)[2]<-"White_box"
 colnames(valid)[3]<-"Black_box"
 
+#bootstrap setup
+boot<-as.data.frame(cbind(labs_qda[boot_vals],
+                          myshape$White_box[boot_vals],
+                          myshape$Black_box[boot_vals]))
+colnames(boot)[1]<-"labs_svm"
+colnames(boot)[2]<-"White_box"
+colnames(boot)[3]<-"Black_box"
 
 svmfit=svm(as.factor(labs_svm) ~ White_box + Black_box,
        data=train,
@@ -602,6 +924,10 @@ ypred=predict(svmfit ,valid)
 table(predict=ypred, truth=valid$labs_svm)
 mean(ypred== valid$labs_svm )
 
+#bootstraped validation
+ypred=predict(svmfit ,boot)
+table(predict=ypred, truth=boot$labs_svm)
+mean(ypred== boot$labs_svm )
 
 #classifying Trapezoid and Diamond vs. Square and Pentagon and Hexagon
 #using SP values and Eccentricity
@@ -609,6 +935,8 @@ mean(ypred== valid$labs_svm )
 
 #training setup
 train_vals<-c(train_11, train_9, train_3, train_2, train_5)
+
+boot_vals<-c(boot_11, boot_9, boot_3, boot_2, boot_5)
 
 labs_qda<-as.numeric(labs)
 labs_qda[c(trap_rand, diam_rand)]<-1
@@ -636,6 +964,13 @@ colnames(valid)[1]<-"labs_svm"
 colnames(valid)[2]<-"SP"
 colnames(valid)[3]<-"Eccent"
 
+#bootstrap setup
+boot<-as.data.frame(cbind(labs_qda[boot_vals],
+                          mydata$white[boot_vals]/(mydata$white[boot_vals]+mydata$black[boot_vals]),
+                          myshape$Shape_eccent[boot_vals]))
+colnames(boot)[1]<-"labs_svm"
+colnames(boot)[2]<-"SP"
+colnames(boot)[3]<-"Eccent"
 
 svmfit=svm(as.factor(labs_svm) ~ Eccent + SP,
        data=train,
@@ -659,7 +994,10 @@ ypred=predict(svmfit ,valid)
 table(predict=ypred, truth=valid$labs_svm)
 mean(ypred== valid$labs_svm )
 
-
+#bootstraped validation
+ypred=predict(svmfit ,boot)
+table(predict=ypred, truth=boot$labs_svm)
+mean(ypred== boot$labs_svm )
 
 #classifying Trapezoid vs. Diamond
 #using Black_box and White_box
@@ -668,6 +1006,8 @@ mean(ypred== valid$labs_svm )
 
 #training setup
 train_vals<-c(train_11, train_2)
+
+boot_vals<-c(boot_11, boot_2)
 
 labs_qda<-as.numeric(labs)
 labs_qda[trap_rand]<-1
@@ -692,6 +1032,13 @@ colnames(valid)[1]<-"labs_svm"
 colnames(valid)[2]<-"Black_box"
 colnames(valid)[3]<-"White_box"
 
+#bootstrap setup
+boot<-as.data.frame(cbind(labs_qda[boot_vals],
+                          myshape$Black_box[boot_vals],
+                          myshape$White_box[boot_vals]))
+colnames(boot)[1]<-"labs_svm"
+colnames(boot)[2]<-"Black_box"
+colnames(boot)[3]<-"White_box"
 
 svmfit=svm(as.factor(labs_svm) ~ Black_box + White_box,
        data=train,
@@ -715,7 +1062,10 @@ ypred=predict(svmfit ,valid)
 table(predict=ypred, truth=valid$labs_svm)
 mean(ypred== valid$labs_svm )
 
-
+#bootstraped validation
+ypred=predict(svmfit ,boot)
+table(predict=ypred, truth=boot$labs_svm)
+mean(ypred== boot$labs_svm )
 
 #classifying  Square vs. Pentagon vs. Hexagon
 #using Black_box and White_box
@@ -725,6 +1075,8 @@ mean(ypred== valid$labs_svm )
 
 #training setup
 train_vals<-c(train_9, train_3, train_5)
+
+boot_vals<-c(boot_9, boot_3, boot_5)
 
 labs_qda<-as.numeric(labs)
 labs_qda[c(squ_rand)]<-1
@@ -751,6 +1103,13 @@ colnames(valid)[1]<-"labs_svm"
 colnames(valid)[2]<-"White_box"
 colnames(valid)[3]<-"Black_box"
 
+#bootstrap setup
+boot<-as.data.frame(cbind(labs_qda[boot_vals],
+                          myshape$White_box[boot_vals],
+                          myshape$Black_box[boot_vals]))
+colnames(boot)[1]<-"labs_svm"
+colnames(boot)[2]<-"White_box"
+colnames(boot)[3]<-"Black_box"
 
 svmfit=svm(as.factor(labs_svm) ~ White_box + Black_box,
        data=train,
@@ -773,3 +1132,8 @@ mean(ypred== train$labs_svm )
 ypred=predict(svmfit ,valid)
 table(predict=ypred, truth=valid$labs_svm)
 mean(ypred== valid$labs_svm )
+
+#bootstraped validation
+ypred=predict(svmfit ,boot)
+table(predict=ypred, truth=boot$labs_svm)
+mean(ypred== boot$labs_svm )

@@ -34,19 +34,28 @@ mean(per_ml)
 
 #lamberti
 
-tp_fp_l<-c(402, 12, 8,
-		  618, 12, 6,
+tp_fp_l<-c(23+307+41, 12, 8,
+		  27+622, 12, 6,
 		  904, 8, 10,
 		  4, 12)
 
-fp_l<-c( 71, 0, 0,
-	   	1, 0, 0,
+fp_l<-c( 41, 0, 0,
+	   	2, 0, 0,
 	    0, 0, 0,
 	    0, 0 )
 
 per_l<-(tp_fp_l - fp_l)/tp_fp_l
 mean(per_l)
 
+#bootstrap validation
+tp_v<-c( 991, 945 )
 
+fp_v<-c( 9, 55 )
+
+per_v<-c(tp_v/(tp_v+fp_v), rep(1, 10))
+
+per_v
+
+mean(per_v)
 
 #
