@@ -22,4 +22,4 @@ Overall, we are able to acheive near perfect classification with an overall clas
 
 ## 2021 SDSS Short Paper
 
-The referred short paper entitled 'SVM-Based Models for Pill Shape Classification' is also available for download here. 
+The referred short paper entitled 'SVM-Based Models for Pill Shape Classification' is also available for download here: https://github.com/billyl320/human_decision_tree_pills/blob/master/SDSS_Format_HMH_Pill_Shape_Classification.pdf. 
