@@ -19,3 +19,7 @@ The plots branch provides many of the R generated scatterplots used to manually 
 ## Results
 
 Overall, we are able to acheive near perfect classification with an overall classification rate of 97.83%.  Our only errors occur between capsule and oval class shapes.  
+
+## 2021 SDSS Short Paper
+
+The referred short paper entitled 'SVM-Based Models for Pill Shape Classification' is also available for download here. 
